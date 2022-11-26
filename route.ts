@@ -1,4 +1,5 @@
 import React from 'react';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { RouteContext, RouterContext } from './context.js';
 
 function renderChildren(children: React.ReactNode) {
@@ -10,7 +11,7 @@ function renderChildren(children: React.ReactNode) {
 
 export interface RouteProps extends React.PropsWithChildren {
     path?: string;
-    error?: React.ReactElement;
+    error?: React.ComponentType<FallbackProps>;
 }
 
 export default function Route({ children, path, error }: RouteProps) {
@@ -57,14 +58,24 @@ export default function Route({ children, path, error }: RouteProps) {
     const props = { value: childRoute };
 
     try {
-        const routeChildren = renderChildren(children);
-        if (Array.isArray(children)) {
-            return React.createElement(RouteContext.Provider, props, ...routeChildren);
+        let routeChildren = renderChildren(children);
+        if (!Array.isArray(routeChildren)) {
+            routeChildren = [routeChildren];
+        }
+
+        if (error) {
+            const childrenWithErrorBoundary = React.createElement(ErrorBoundary, { FallbackComponent: error }, ...routeChildren);
+            return React.createElement(RouteContext.Provider, props, childrenWithErrorBoundary);
+
         } else {
             return React.createElement(RouteContext.Provider, props, routeChildren);
         }
+
     } catch (e) {
-        childRoute.error = e;
-        return React.createElement(RouteContext.Provider, props, error);
+        if (error) {
+            childRoute.error = e;
+            return React.createElement(RouteContext.Provider, props, React.createElement(error, { error: e, resetErrorBoundary: () => { } }));
+        }
+        return null;
     }
 }

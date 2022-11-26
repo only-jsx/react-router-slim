@@ -1,6 +1,6 @@
 {
     "name": "react-router-slim",
-    "version": "0.0.1-beta.3",
+    "version": "0.0.1-beta.4",
     "description": "Declarative browser routing for React Web applications",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -12,11 +12,12 @@
     "license": "ISC",
     "dependencies": {
         "path-to-regexp": "^6.2.1",
-        "react": "^18.2.0"
+        "react": "^18.2.0",
+        "react-error-boundary": "^3.1.4"
     },
     "devDependencies": {
-        "@types/react": "^18.0.25",
         "@types/node": "^18.11.9",
+        "@types/react": "^18.0.25",
         "typescript": "^4.8.4"
     },
     "repository": {
@@ -31,6 +32,9 @@
         "dist/"
     ],
     "keywords": [
-        "react", "router", "routing", "history"
+        "react",
+        "router",
+        "routing",
+        "history"
     ]
 }
