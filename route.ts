@@ -57,28 +57,27 @@ export default function Route({ children, path, error }: RouteProps) {
 
     const props = { value: childRoute };
 
-    const rc = React.createElement.bind(this, RouteContext.Provider, props);
-    const rce = rc.bind(this, ErrorBoundary, { FallbackComponent: error });
     try {
         let routeChildren = renderChildren(children);
         if (Array.isArray(routeChildren)) {
             if (error) {
-                return rce(...routeChildren);
+                return React.createElement(RouteContext.Provider, props, React.createElement(ErrorBoundary, { FallbackComponent: error }, ...routeChildren));
             }
 
-            return rc(...routeChildren);
+            return React.createElement(RouteContext.Provider, props, ...routeChildren);
 
         } else {
             if (error) {
-                return rce(routeChildren);
+                return React.createElement(RouteContext.Provider, props, React.createElement(ErrorBoundary, { FallbackComponent: error }, routeChildren));
             }
 
-            return rc(routeChildren);
+            return React.createElement(RouteContext.Provider, props, routeChildren);
         }
+
     } catch (e) {
         if (error) {
             childRoute.error = e;
-            return rc(React.createElement(error, { error: e, resetErrorBoundary: () => { } }));
+            return React.createElement(RouteContext.Provider, props, React.createElement(error, { error: e, resetErrorBoundary: () => { } }));
         }
         return null;
     }
