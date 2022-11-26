@@ -58,7 +58,7 @@ export default function Route({ children, path, error }: RouteProps) {
     const props = { value: childRoute };
 
     try {
-        let routeChildren = renderChildren(children);
+        const routeChildren = renderChildren(children);
         if (Array.isArray(routeChildren)) {
             if (error) {
                 return React.createElement(RouteContext.Provider, props, React.createElement(ErrorBoundary, { FallbackComponent: error }, ...routeChildren));
