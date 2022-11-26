@@ -31,9 +31,9 @@ function renderChildren(children: React.ReactNode) {
 }
 
 export interface RouterProps extends React.PropsWithChildren {
-    onUpdated: () => void;
-    navigate: (p: string, data?: any) => void;
-    match: (path: string, url: string) => PathMatch;
+    onUpdated?: () => void;
+    navigate?: (p: string, data?: any) => void;
+    match?: (path: string, url: string) => PathMatch;
 }
 
 export default function Router({ children, onUpdated, navigate: n = defNavigate, match: m = defMatch }: RouterProps) {

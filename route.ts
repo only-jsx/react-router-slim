@@ -10,7 +10,7 @@ function renderChildren(children: React.ReactNode) {
 
 export interface RouteProps extends React.PropsWithChildren {
     path?: string;
-    error: React.ReactElement;
+    error?: React.ReactElement;
 }
 
 export default function Route({ children, path, error }: RouteProps) {
@@ -18,11 +18,11 @@ export default function Route({ children, path, error }: RouteProps) {
     const route = React.useContext(RouteContext);
 
     if (!router.match) {
-        return 'Route requires match in Router context';
+        return React.createElement(React.Fragment, null, 'Route requires match in Router context');
     }
 
     if (route.params && Object.keys(route.params).length > 1) {
-        return 'Parameters are not allowed in parent routes';
+        return React.createElement(React.Fragment, null, 'Parameters are not allowed in parent routes');
     }
 
     let routeParams = {};
