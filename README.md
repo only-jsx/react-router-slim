@@ -43,7 +43,7 @@ const RoutedButton = ({ children }) => {
         return 'Routes navigate is not defined';
     }
 
-    return <button onClick={(e) => router.navigate('/hello/world')}>{children}</button>;
+    return <button onClick={(e) => router.navigate('/hello/world', {state: 0}, true)}>{children}</button>;
 }
 
 const App = () => {

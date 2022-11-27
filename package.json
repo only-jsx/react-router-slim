@@ -1,6 +1,6 @@
 {
     "name": "react-router-slim",
-    "version": "0.0.1-beta.11",
+    "version": "0.0.1-beta.12",
     "description": "Declarative browser routing for React Web applications",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -28,7 +28,6 @@
         "url": "https://github.com/only-jsx/react-router-slim/issues"
     },
     "files": [
-        "README.md",
         "dist/"
     ],
     "keywords": [
