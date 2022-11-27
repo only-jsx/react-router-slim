@@ -18,8 +18,12 @@ function defMatch(path: string, url: string): PathMatch {
     return { match, params };
 }
 
-function defNavigate(path: string, data?: any) {
-    history.pushState(data, '', path);
+function defNavigate(path: string, data?: any, replace?: boolean) {
+    if (replace) {
+        history.replaceState(data, '', path);
+    } else {
+        history.pushState(data, '', path);
+    }
 }
 
 function renderChildren(children: React.ReactNode) {
@@ -31,9 +35,9 @@ function renderChildren(children: React.ReactNode) {
 }
 
 export interface RouterProps extends React.PropsWithChildren {
-    onUpdated: () => void;
-    navigate: (p: string, data?: any) => void;
-    match: (path: string, url: string) => PathMatch;
+    onUpdated?: () => void;
+    navigate?: (path: string, data?: any, replace?: boolean) => void;
+    match?: (path: string, url: string) => PathMatch;
 }
 
 export default function Router({ children, onUpdated, navigate: n = defNavigate, match: m = defMatch }: RouterProps) {
@@ -58,8 +62,8 @@ export default function Router({ children, onUpdated, navigate: n = defNavigate,
 
     const router = {
         match: m,
-        navigate(path: string, data?: any) {
-            n(path, data);
+        navigate(path: string, data?: any, replace?: boolean) {
+            n(path, data, replace);
             setPath(window.location.pathname);
         }
     };
