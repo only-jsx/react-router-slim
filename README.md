@@ -8,7 +8,7 @@ The source codes are in the repository https://github.com/only-jsx/examples/tree
 ```tsx
 //index.tsx
 import React from 'react'
-import { Router, Route } from 'react-router-slim';
+import { Router, Route, RouterContext, RouteContext } from 'react-router-slim';
 
 interface LinkProps extends React.PropsWithChildren {
     to: string;
