@@ -1,9 +1,9 @@
 # react-router-slim
-Declarative browser routing for react
+Declarative browser routing for React Web Applications
 
 ## examples
 
-The source codes are in the repository https://github.com/only-jsx/examples/tree/main/react-router-slim.
+The source codes are in the repository https://github.com/only-jsx/react-router-slim-examples
 
 ```tsx
 //index.tsx
