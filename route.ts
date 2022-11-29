@@ -16,11 +16,12 @@ export interface RouteProps extends React.PropsWithChildren {
 
 export default function Route({ children, path, error }: RouteProps) {
     const router = React.useContext<RouterContext>(RouterContext);
-    const route = React.useContext<RouteContext>(RouteContext);
 
     if (!router.match) {
         return React.createElement(React.Fragment, null, 'Route requires match in Router context');
     }
+
+    const route = React.useContext<RouteContext>(RouteContext);
 
     if (route.params && Object.keys(route.params).length > 1) {
         return React.createElement(React.Fragment, null, 'Parameters are not allowed in parent routes');
