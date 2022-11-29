@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { RouteContext, RouterContext } from './context.js';
 
@@ -15,8 +15,8 @@ export interface RouteProps extends React.PropsWithChildren {
 }
 
 export default function Route({ children, path, error }: RouteProps) {
-    const router = React.useContext(RouterContext);
-    const route = React.useContext(RouteContext);
+    const router = React.useContext<RouterContext>(RouterContext);
+    const route = React.useContext<RouteContext>(RouteContext);
 
     if (!router.match) {
         return React.createElement(React.Fragment, null, 'Route requires match in Router context');

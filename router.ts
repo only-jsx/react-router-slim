@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { pathToRegexp } from 'path-to-regexp';
 import { RouterContext, Params, PathMatch } from './context';
 
