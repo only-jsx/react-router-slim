@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { RouteContext, RouterContext } from './context.js';
+import { RouteContext, RouterContext } from './context';
 
 function renderChildren(children: React.ReactNode) {
     if (Array.isArray(children)) {
