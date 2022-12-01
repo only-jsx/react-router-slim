@@ -7,6 +7,7 @@ export interface Params {
 export interface PathMatch {
     match?: RegExpExecArray | null;
     params?: Params;
+    nextPath?: string;
 }
 
 export interface RouterContext {
