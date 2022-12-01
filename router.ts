@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { pathToRegexp } from 'path-to-regexp';
+import { tokensToRegexp, parse, Key } from 'path-to-regexp';
 import { RouterContext, Params, PathMatch } from './context';
 
 function defMatch(path: string, url: string): PathMatch {
     const keys = [];
-    const pattern = pathToRegexp(path, keys);
+    const tokens = parse(path);
+    const pattern = tokensToRegexp(tokens, keys);
     const match = pattern.exec(url);
     if (!match) {
         return {};
@@ -12,10 +13,17 @@ function defMatch(path: string, url: string): PathMatch {
 
     const params: Params = {};
     for (let i = 1; i < match.length; i++) {
-        params[keys[i - 1].name] = match[i];
+        params[keys[i - 1]['name']] = match[i];
     }
 
-    return { match, params };
+    let nextPath = '';
+    if (typeof tokens?.[0] === 'string') {
+        nextPath = (tokens[1] as Key)?.prefix ? tokens[0] + (tokens[1] as Key).prefix : tokens[0];
+    } else {
+        nextPath = (tokens?.[0] as Key).prefix || '';
+    }
+
+    return { match, params, nextPath };
 }
 
 function defNavigate(path: string, data?: any, replace?: boolean) {
@@ -24,14 +32,6 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
     } else {
         history.pushState(data, '', path);
     }
-}
-
-function renderChildren(children: React.ReactNode) {
-    if (Array.isArray(children)) {
-        return children.map((c) => renderChildren(c));
-    }
-
-    return children;
 }
 
 export interface RouterProps extends React.PropsWithChildren {
@@ -68,13 +68,11 @@ export default function Router({ children, onUpdated, navigate: n = defNavigate,
         }
     };
 
-    const routerChildren = renderChildren(children);
-
     const props = { value: router };
 
-    if (Array.isArray(routerChildren)) {
-        return React.createElement(RouterContext.Provider, props, ...routerChildren);
+    if (Array.isArray(children)) {
+        return React.createElement(RouterContext.Provider, props, ...children);
     }
 
-    return React.createElement(RouterContext.Provider, props, routerChildren);
+    return React.createElement(RouterContext.Provider, props, children);
 }

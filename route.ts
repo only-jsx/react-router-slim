@@ -2,13 +2,6 @@ import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { RouteContext, RouterContext } from './context';
 
-function renderChildren(children: React.ReactNode) {
-    if (Array.isArray(children)) {
-        return children.map(c => renderChildren(c));
-    }
-    return children;
-}
-
 export interface RouteProps extends React.PropsWithChildren {
     path?: string;
     error?: React.ComponentType<FallbackProps>;
@@ -23,31 +16,33 @@ export default function Route({ children, path, error }: RouteProps) {
 
     const route = React.useContext<RouteContext>(RouteContext);
 
-    if (route.params && Object.keys(route.params).length > 1) {
-        return React.createElement(React.Fragment, null, 'Parameters are not allowed in parent routes');
+    if (route.params) {
+        const keys = Object.keys(route.params);
+        if (keys.length > 1 || keys.length && keys[0] != '0') {
+            return React.createElement(React.Fragment, null, 'Parameters are not allowed in parent routes');
+        }
     }
 
     let routeParams = {};
     let routePath = (route.path || '') + (path || '');
+    const { pathname } = window.location;
 
     if (path) {
-        const { match, params } = router.match(routePath, window.location.pathname);
+        const { match, params, nextPath } = router.match(routePath, pathname);
 
         if (!match) {
             return null;
         }
 
         routeParams = params;
+        routePath = nextPath;
 
         if (!route.matches) {
             route.matches = [];
         }
 
-        route.matches.push({ match, params });
+        route.matches.push({ match, params, nextPath });
 
-        if (match.length > 1) {
-            routePath = match[0].substring(0, match[0].length - match[1].length);
-        }
     } else {
         if (route.matches?.length || route.error) {
             return null;
@@ -58,28 +53,17 @@ export default function Route({ children, path, error }: RouteProps) {
 
     const props = { value: childRoute };
 
-    try {
-        const routeChildren = renderChildren(children);
-        if (Array.isArray(routeChildren)) {
-            if (error) {
-                return React.createElement(RouteContext.Provider, props, React.createElement(ErrorBoundary, { FallbackComponent: error }, ...routeChildren));
-            }
-
-            return React.createElement(RouteContext.Provider, props, ...routeChildren);
-
-        } else {
-            if (error) {
-                return React.createElement(RouteContext.Provider, props, React.createElement(ErrorBoundary, { FallbackComponent: error }, routeChildren));
-            }
-
-            return React.createElement(RouteContext.Provider, props, routeChildren);
-        }
-
-    } catch (e) {
+    if (Array.isArray(children)) {
         if (error) {
-            childRoute.error = e;
-            return React.createElement(RouteContext.Provider, props, React.createElement(error, { error: e, resetErrorBoundary: () => { } }));
+            return React.createElement(RouteContext.Provider, props, React.createElement(ErrorBoundary, { FallbackComponent: error }, ...children));
         }
-        return null;
+
+        return React.createElement(RouteContext.Provider, props, ...children);
     }
+
+    if (error) {
+        return React.createElement(RouteContext.Provider, props, React.createElement(ErrorBoundary, { FallbackComponent: error }, children));
+    }
+
+    return React.createElement(RouteContext.Provider, props, children);
 }
