@@ -57,6 +57,7 @@ describe('Test Route component', () => {
     });
 
     beforeEach(() => {
+        router.match = defMatch;
         route.path = '/';
         delete route.error;
         delete route.matches;
@@ -64,12 +65,8 @@ describe('Test Route component', () => {
     });
 
     test('without Router', () => {
-        const prev = router.match;
         delete router.match;
-        const r = Route({});
-        router.match = prev;
-        expect(r).toHaveProperty('props');
-        expect(r?.props).toStrictEqual({ children: 'Route requires match in Router context' });
+        expect(()=>Route({})).toThrowError('Route requires a match function in the Router context');
     });
 
     test('without children', () => {
@@ -119,23 +116,7 @@ describe('Test Route component', () => {
     testParentParameters('without parent parameters');
     testParentParameters('empty parent parameters', {});
     testParentParameters('one parent parameter', { '0': '1' });
-
-    test('many parent parameters', () => {
-        route.params = { id: '1', userId: '2' };
-        const r1 = Route({});
-        expect(r1).toHaveProperty('props');
-        expect(r1?.props).toStrictEqual({ children: 'Parameters are not allowed in parent routes' });
-
-        route.params = { 0: '1', 1: '2' };
-        const r2 = Route({});
-        expect(r2).toHaveProperty('props');
-        expect(r2?.props).toStrictEqual({ children: 'Parameters are not allowed in parent routes' });
-
-        route.params = { id: '1' };
-        const r3 = Route({});
-        expect(r3).toHaveProperty('props');
-        expect(r3?.props).toStrictEqual({ children: 'Parameters are not allowed in parent routes' });
-    });
+    testParentParameters('many parent parameters', { id: '1', userId: '2', 0: '1', 1: '2'});
 
     test('correct path', () => {
         router.navigate?.('/parent/child');
