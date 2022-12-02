@@ -11,17 +11,10 @@ export default function Route({ children, path, error }: RouteProps) {
     const router = React.useContext<RouterContext>(RouterContext);
 
     if (!router.match) {
-        return React.createElement(React.Fragment, null, 'Route requires match in Router context');
+        throw new Error('Route requires a match function in the Router context');
     }
 
     const route = React.useContext<RouteContext>(RouteContext);
-
-    if (route.params) {
-        const keys = Object.keys(route.params);
-        if (keys.length > 1 || keys.length && keys[0] != '0') {
-            return React.createElement(React.Fragment, null, 'Parameters are not allowed in parent routes');
-        }
-    }
 
     let routeParams = {};
     let routePath = (route.path || '') + (path || '');
