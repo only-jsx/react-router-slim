@@ -17,10 +17,10 @@ function defMatch(path: string, url: string): PathMatch {
     }
 
     let nextPath = '';
-    if (typeof tokens?.[0] === 'string') {
+    if (typeof tokens[0] === 'string') {
         nextPath = (tokens[1] as Key)?.prefix ? tokens[0] + (tokens[1] as Key).prefix : tokens[0];
     } else {
-        nextPath = (tokens?.[0] as Key).prefix || '';
+        nextPath = (tokens[0] as Key).prefix || '';
     }
 
     return { match, params, nextPath };

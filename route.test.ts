@@ -1,32 +1,8 @@
 import { describe, expect, test } from '@jest/globals';
 import Route from './route';
-import { RouterContext, RouteContext, PathMatch, Params } from './context';
+import Router from './router';
+import { RouterContext, RouteContext, Params } from './context';
 import * as React from 'react';
-import { tokensToRegexp, parse, Key } from 'path-to-regexp';
-
-function defMatch(path: string, url: string): PathMatch {
-    const keys = [];
-    const tokens = parse(path);
-    const pattern = tokensToRegexp(tokens, keys);
-    const match = pattern.exec(url);
-    if (!match) {
-        return {};
-    }
-
-    const params: Params = {};
-    for (let i = 1; i < match.length; i++) {
-        params[keys[i - 1]['name']] = match[i];
-    }
-
-    let nextPath = '';
-    if (typeof tokens?.[0] === 'string') {
-        nextPath = (tokens[1] as Key)?.prefix ? tokens[0] + (tokens[1] as Key).prefix : tokens[0];
-    } else {
-        nextPath = (tokens?.[0] as Key).prefix || '';
-    }
-
-    return { match, params, nextPath };
-}
 
 function defNavigate(path: string, data?: any, replace?: boolean) {
     if (replace) {
@@ -38,11 +14,17 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
 
 describe('Test Route component', () => {
 
-    const router: RouterContext = {
-        match: defMatch,
-        navigate: defNavigate,
-    }
+    const setState = jest.fn(a => [a, setState]);
 
+    const useStateSpy = jest.spyOn(React, 'useState') as unknown as jest.SpyInstance<[unknown, React.Dispatch<unknown>], [unknown]>;
+    useStateSpy.mockImplementation((initialState: unknown) => [initialState, setState]);
+
+    const useEffectSpy = jest.spyOn(React, 'useEffect');
+    useEffectSpy.mockImplementation(f => { f() });
+
+    const defMatch = Router({ children: 1 })?.props.value.match;
+
+    const router: RouterContext = {};
     const route: RouteContext = {}
 
     const useContextSpy = jest.spyOn(React, 'useContext');
@@ -58,6 +40,7 @@ describe('Test Route component', () => {
 
     beforeEach(() => {
         router.match = defMatch;
+        router.navigate = defNavigate;
         route.path = '/';
         delete route.error;
         delete route.matches;
@@ -66,7 +49,7 @@ describe('Test Route component', () => {
 
     test('without Router', () => {
         delete router.match;
-        expect(()=>Route({})).toThrowError('Route requires a match function in the Router context');
+        expect(() => Route({})).toThrowError('Route requires a match function in the Router context');
     });
 
     test('without children', () => {
@@ -116,7 +99,7 @@ describe('Test Route component', () => {
     testParentParameters('without parent parameters');
     testParentParameters('empty parent parameters', {});
     testParentParameters('one parent parameter', { '0': '1' });
-    testParentParameters('many parent parameters', { id: '1', userId: '2', 0: '1', 1: '2'});
+    testParentParameters('many parent parameters', { id: '1', userId: '2', 0: '1', 1: '2' });
 
     test('correct path', () => {
         router.navigate?.('/parent/child');
@@ -182,53 +165,22 @@ describe('Test Route component', () => {
     });
 
     test('path', () => {
-        router.navigate?.('/parent1/parent2/child/');
-        route.path = '/par\\ent1/parent2/';
-        const r1 = Route({ children: '1', path: ':child/' });
-        expect(r1).toHaveProperty('props');
-        const context1 = r1?.props as React.ProviderProps<RouteContext>;
-        expect(context1.children).toBe('1');
-        expect(context1.value.path).toBe('/parent1/parent2/');
+        const testPathHandle = (navigated: string, contextPath: string, path: string, nextPath: string, params: object) => {
+            router.navigate?.(navigated);
+            route.path = contextPath;
+            const r1 = Route({ children: '1', path });
+            expect(r1).toHaveProperty('props');
+            const c = r1?.props as React.ProviderProps<RouteContext>;
+            expect(c.children).toBe('1');
+            expect(c.value.path).toBe(nextPath);
+            expect(c.value.params).toStrictEqual(params);
+        };
 
-        router.navigate?.('/child1/child2/index.html');
-        route.path = '/child1/';
-        const r2 = Route({ children: '1', path: 'child2/(in)(.*).html' });
-        expect(r2).toHaveProperty('props');
-        const context2 = r2?.props as React.ProviderProps<RouteContext>;
-        expect(context2.children).toBe('1');
-        expect(context2.value.path).toBe('/child1/child2/');
-
-        router.navigate?.('/child1/child2/index.html');
-        route.path = '';
-        const r3 = Route({ children: '1', path: '/child1/:c1/(inde)(.*).html' });
-        expect(r3).toHaveProperty('props');
-        const context3 = r3?.props as React.ProviderProps<RouteContext>;
-        expect(context3.children).toBe('1');
-        expect(context3.value.path).toBe('/child1/');
-        expect(context3.value.params).toStrictEqual({ c1: 'child2', '0': 'inde', '1': 'x' });
-
-        router.navigate?.('/child1/child2');
-        route.path = '/child1/';
-        const r4 = Route({ children: '1', path: '(child2)' });
-        expect(r4).toHaveProperty('props');
-        const context4 = r4?.props as React.ProviderProps<RouteContext>;
-        expect(context4.children).toBe('1');
-        expect(context4.value.path).toBe('/child1/');
-
-        router.navigate?.('/child1/child2/');
-        route.path = '/child1/';
-        const r5 = Route({ children: '1', path: 'child2/' });
-        expect(r5).toHaveProperty('props');
-        const context5 = r5?.props as React.ProviderProps<RouteContext>;
-        expect(context5.children).toBe('1');
-        expect(context5.value.path).toBe('/child1/child2/');
-
-        router.navigate?.('/child1/');
-        route.path = '';
-        const r6 = Route({ children: '1', path: '/:child1' });
-        expect(r6).toHaveProperty('props');
-        const context6 = r6?.props as React.ProviderProps<RouteContext>;
-        expect(context6.children).toBe('1');
-        expect(context6.value.path).toBe('/');
+        testPathHandle('/parent1/parent2/child/', '/par\\ent1/parent2/', ':child/', '/parent1/parent2/', { child: 'child' });
+        testPathHandle('/child1/child2/index.html', '/child1/', 'child2/(in)(.*).html', '/child1/child2/', { 0: 'in', 1: 'dex' });
+        testPathHandle('/child1/child2/index.html', '', '/child1/:c1/(inde)(.*).html', '/child1/', { c1: 'child2', '0': 'inde', '1': 'x' });
+        testPathHandle('/child1/child2', '/child1/', '(child2)', '/child1/', { 0: 'child2' });
+        testPathHandle('/child1/child2/', '/child1/', 'child2/', '/child1/child2/', {});
+        testPathHandle('/child1/', '', '/:child1', '/', { child1: 'child1' });
     });
 });
