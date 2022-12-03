@@ -48,8 +48,12 @@ const RoutedButton = ({ children }) => {
 
 const App = () => {
     return <Router>
+        {/*Regular expressions in path*/}
         <Route path="/router/(.*)">
             <Layout />
+            {/*Part of a parent route path before any named parameter or regexp*/}
+            {/*becames a prefix for a child route*/}
+            {/*so this actually matches to /router/home*/}
             <Route path="home">
                 <RoutedSpan>RoutedSpan</RoutedSpan>
                 <RoutedButton>RoutedButton</RoutedButton>
@@ -62,6 +66,7 @@ const App = () => {
             </Route>
             <Route path="todos/(.*)" error={ErrorBoundary}>
                 <h5>Todo</h5>
+                {/*Named parameters*/}
                 <Route path=":id"><Todo/></Route>
             </Route>
             <Route path="error" error={ErrorBoundary}><ErrorComponent/></Route>
