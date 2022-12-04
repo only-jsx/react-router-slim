@@ -11,7 +11,7 @@ export interface PathMatch {
 }
 
 export interface RouterContext {
-    match?: (path: string, url: string) => PathMatch;
+    match?: (path: string) => PathMatch;
     navigate?: (path: string, data?: any, replace?: boolean) => void;
 }
 
