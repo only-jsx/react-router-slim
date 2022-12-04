@@ -39,19 +39,27 @@ describe('Test Router component', () => {
         expect(r?.props.value).toHaveProperty('navigate');
     });
 
-    test('with match and navigate props', () => {
+    test('with match, navigate, changeEvent and getCurrentPath props', () => {
         const match = (path: string) => ({});
-        const navigate = jest.fn((p) => { });
-        const r = Router({ children: [1, 2, 3], match, navigate });
+        const navigate = jest.fn((p) => { window.location.hash = p });
+        const changeEvent = 'hashchange';
+        const getCurrentPath = () => window.location.hash;
+        const onUpdated = jest.fn();
+
+        const r = Router({ children: [1, 2, 3], onUpdated, match, navigate, changeEvent, getCurrentPath });
         expect(r).toHaveProperty('props');
         expect(r?.props.children).toStrictEqual([1, 2, 3]);
         expect(r?.props.value.match).toBe(match);
-        const prev = window.location.pathname;
+        expect(onUpdated).toHaveBeenCalledTimes(1);
+        const prev = getCurrentPath();
         expect(prev).not.toBe('/path');
         r?.props.value.navigate?.('/path');
         expect(navigate).toHaveBeenCalled();
-        expect(setState).toHaveBeenCalled();
-        expect(window.location.pathname).toBe(prev);
+        expect(setState).toHaveBeenCalledTimes(1);
+        expect(getCurrentPath()).toBe('#/path');
+
+        window.dispatchEvent(new Event(changeEvent));
+        expect(setState).toHaveBeenCalledTimes(2);
     });
 
     test('default match', () => {

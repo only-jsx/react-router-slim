@@ -36,45 +36,57 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
     }
 }
 
+const defChangeEvent = 'popstate';
+
+function defGetCurrentPath() {
+    return window.location.pathname;
+}
+
 export interface RouterProps extends React.PropsWithChildren {
     onUpdated?: () => void;
     navigate?: (path: string, data?: any, replace?: boolean) => void;
     match?: (path: string) => PathMatch;
+    changeEvent?: string;
+    getCurrentPath?: () => string;
 }
 
-export default function Router({ children, onUpdated, navigate: n = defNavigate, match: m = defMatch }: RouterProps) {
-
-    const [path, setPath] = React.useState(window.location.pathname);
-
-    React.useEffect(() => { onUpdated?.(); }, [path]);
-
-    React.useEffect(() => {
-        function onPopState() {
-            setPath(window.location.pathname);
-        }
-
-        window.addEventListener('popstate', onPopState);
-
-        return () => window.removeEventListener('popstate', onPopState);
-    }, []);
-
-    if (!children) {
-        return null;
-    }
-
+export default function Router(props: RouterProps) {
+    const { children, onUpdated, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
     const router = {
         match: m,
         navigate(path: string, data?: any, replace?: boolean) {
             n(path, data, replace);
             setPath(window.location.pathname);
-        }
+        },
+        changeEvent: c,
+        getCurrentPath: g,
     };
 
-    const props = { value: router };
+    const [path, setPath] = React.useState(router.getCurrentPath());
 
-    if (Array.isArray(children)) {
-        return React.createElement(RouterContext.Provider, props, ...children);
+    React.useEffect(() => { onUpdated?.(); }, [path]);
+
+    React.useEffect(() => {
+        function onPopState() {
+            setPath(router.getCurrentPath());
+        }
+
+        if (router.changeEvent && router.getCurrentPath) {
+            window.addEventListener(router.changeEvent, onPopState);
+
+            return () => window.removeEventListener(router.changeEvent, onPopState);
+        }
+    }, [router.changeEvent, router.getCurrentPath]);
+
+    if (!children) {
+        return null;
     }
 
-    return React.createElement(RouterContext.Provider, props, children);
+    const providerProps = { value: router };
+
+    if (Array.isArray(children)) {
+        return React.createElement(RouterContext.Provider, providerProps, ...children);
+    }
+
+    return React.createElement(RouterContext.Provider, providerProps, children);
 }
