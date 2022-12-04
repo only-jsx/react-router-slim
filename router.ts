@@ -30,9 +30,9 @@ function defMatch(path: string): PathMatch {
 
 function defNavigate(path: string, data?: any, replace?: boolean) {
     if (replace) {
-        history.replaceState(data, '', path);
+        window.history.replaceState(data, '', path);
     } else {
-        history.pushState(data, '', path);
+        window.history.pushState(data, '', path);
     }
 }
 
