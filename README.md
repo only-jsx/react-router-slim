@@ -1,6 +1,11 @@
 # react-router-slim
 Declarative browser routing for React Web Applications
 
+The default browser history routing strategy can be replaced with
+custom routing strategy (hash, memory, etc.) via Router component props: match, navigate, changeEvent, getCurrentPath.
+Our examples also demonstrate how to implement URL hash routing.
+It does not provide server side routing. You can use the routing provided by your back-end API for this.
+
 ## examples
 
 The source codes are in the repository https://github.com/only-jsx/react-router-slim-examples
