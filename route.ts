@@ -18,10 +18,9 @@ export default function Route({ children, path, error }: RouteProps) {
 
     let routeParams = {};
     let routePath = (route.path || '') + (path || '');
-    const { pathname } = window.location;
 
     if (path) {
-        const { match, params, nextPath } = router.match(routePath, pathname);
+        const { match, params, nextPath } = router.match(routePath);
 
         if (!match) {
             return null;

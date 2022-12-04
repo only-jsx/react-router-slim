@@ -2,11 +2,13 @@ import * as React from 'react';
 import { tokensToRegexp, parse, Key } from 'path-to-regexp';
 import { RouterContext, Params, PathMatch } from './context';
 
-function defMatch(path: string, url: string): PathMatch {
+function defMatch(path: string): PathMatch {
     const keys = [];
     const tokens = parse(path);
     const pattern = tokensToRegexp(tokens, keys);
-    const match = pattern.exec(url);
+
+    const { pathname } = window.location;
+    const match = pattern.exec(pathname);
     if (!match) {
         return {};
     }
@@ -37,7 +39,7 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
 export interface RouterProps extends React.PropsWithChildren {
     onUpdated?: () => void;
     navigate?: (path: string, data?: any, replace?: boolean) => void;
-    match?: (path: string, url: string) => PathMatch;
+    match?: (path: string) => PathMatch;
 }
 
 export default function Router({ children, onUpdated, navigate: n = defNavigate, match: m = defMatch }: RouterProps) {

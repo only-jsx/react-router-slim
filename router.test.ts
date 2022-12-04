@@ -40,7 +40,7 @@ describe('Test Router component', () => {
     });
 
     test('with match and navigate props', () => {
-        const match = (path: string, url: string) => ({});
+        const match = (path: string) => ({});
         const navigate = jest.fn((p) => { });
         const r = Router({ children: [1, 2, 3], match, navigate });
         expect(r).toHaveProperty('props');
@@ -60,29 +60,26 @@ describe('Test Router component', () => {
         expect(r?.props.children).toBe(1);
         expect(r?.props.value).toHaveProperty('match');
         expect(r?.props.value).toHaveProperty('navigate');
-        const m1 = r?.props.value.match?.('/path', '/test');
+
+        r?.props.value.navigate?.('/wrong');
+        const m1 = r?.props.value.match?.('/path');
         expect(m1).toStrictEqual({});
 
-        const m2 = r?.props.value.match?.('/path/:id', '/path/1');
-        const result2 = ['/path/1', '1'] as any;
-        result2.groups = undefined;
-        result2.index = 0;
-        result2.input = '/path/1';
-        expect(m2).toMatchObject({ match: result2, params: { id: '1' }, nextPath: '/path/' });
+        const testMatch = (navigated: string, path: string, mr: string[], params: object, nextPath: string) => {
+            r?.props.value.navigate?.(navigated);
+            const m = r?.props.value.match?.(path);
+            const match = [...mr] as any;
+            match.groups = undefined;
+            match.index = 0;
+            match.input = mr[0];
+            expect(m).toMatchObject({ match, params, nextPath });
+        }
 
-        const m3 = r?.props.value.match?.('/:child', '/child/');
-        const result3 = ['/child/', 'child'] as any;
-        result3.groups = undefined;
-        result3.index = 0;
-        result3.input = '/child/';
-        expect(m3).toMatchObject({ match: result3, params: { child: 'child' }, nextPath: '/' });
-
-        const m4 = r?.props.value.match?.(':child', 'child');
-        const result4 = ['child', 'child'] as any;
-        result4.groups = undefined;
-        result4.index = 0;
-        result4.input = 'child';
-        expect(m4).toMatchObject({ match: result4, params: { child: 'child' }, nextPath: '' });
+        testMatch('/path/1', '/path/:id', ['/path/1', '1'], { id: '1' }, '/path/');
+        testMatch('/path/1/2', '/path/1/:id', ['/path/1/2', '2'], { id: '2' }, '/path/1/');
+        testMatch('/child/', '/:child', ['/child/', 'child'], { child: 'child' }, '/');
+        testMatch('/child', '/:child', ['/child', 'child'], { child: 'child' }, '/');
+        testMatch('/child', '(/child)', ['/child', '/child'], { 0: '/child' }, '');
     });
 
     test('default navigate', () => {
@@ -93,15 +90,13 @@ describe('Test Router component', () => {
         expect(r?.props.value).toHaveProperty('navigate');
         const data1 = {};
         r?.props.value.navigate?.('/path', data1, true);
+        expect(history.state).toBe(data1);
         expect(setState).toHaveBeenCalled();
-        expect(history.length).toBe(1);
 
         const data2 = {};
         r?.props.value.navigate?.('/path', data2, false);
         expect(history.state).toBe(data2);
         expect(setState).toHaveBeenCalled();
-        expect(history.length).toBe(2);
-
         expect(window.location.pathname).toBe('/path');
     });
 
