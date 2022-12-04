@@ -3,7 +3,7 @@ import { tokensToRegexp, parse, Key } from 'path-to-regexp';
 import { RouterContext, Params, PathMatch } from './context';
 
 function defMatch(path: string): PathMatch {
-    const keys = [];
+    const keys: Key[] = [];
     const tokens = parse(path);
     const pattern = tokensToRegexp(tokens, keys);
 
@@ -22,7 +22,7 @@ function defMatch(path: string): PathMatch {
     if (typeof tokens[0] === 'string') {
         nextPath = (tokens[1] as Key)?.prefix ? tokens[0] + (tokens[1] as Key).prefix : tokens[0];
     } else {
-        nextPath = (tokens[0] as Key).prefix || '';
+        nextPath = tokens[0].prefix || '';
     }
 
     return { match, params, nextPath };
