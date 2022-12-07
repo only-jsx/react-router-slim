@@ -13,6 +13,8 @@ export interface PathMatch {
 export interface RouterContext {
     match?: (path: string) => PathMatch;
     navigate?: (path: string, data?: any, replace?: boolean) => void;
+    changeEvent?: string;
+    getCurrentPath?: () => string;
 }
 
 export interface RouteContext {

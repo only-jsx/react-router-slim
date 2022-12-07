@@ -52,7 +52,7 @@ export interface RouterProps extends React.PropsWithChildren {
 
 export default function Router(props: RouterProps) {
     const { children, onUpdated, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
-    const router = {
+    const router: RouterContext = {
         match: m,
         navigate(path: string, data?: any, replace?: boolean) {
             n(path, data, replace);
