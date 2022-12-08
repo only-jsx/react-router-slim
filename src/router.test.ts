@@ -118,6 +118,8 @@ describe('Test Router component', () => {
         expect(r?.props.value).toHaveProperty('navigate');
         expect(onUpdated).toHaveBeenCalled();
 
+        expect(setState).not.toHaveBeenCalled();
+
         window.dispatchEvent(new Event('popstate'));
 
         expect(setState).toHaveBeenCalled();
