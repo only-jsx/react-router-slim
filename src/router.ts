@@ -2,12 +2,18 @@ import * as React from 'react';
 import { tokensToRegexp, parse, Key } from 'path-to-regexp';
 import { RouterContext, Params, PathMatch } from './context';
 
+const defChangeEvent = 'popstate';
+
+function defGetCurrentPath() {
+    return window.location.pathname;
+}
+
 function defMatch(path: string): PathMatch {
     const keys: Key[] = [];
     const tokens = parse(path);
     const pattern = tokensToRegexp(tokens, keys);
 
-    const { pathname } = window.location;
+    const pathname = defGetCurrentPath();
     const match = pattern.exec(pathname);
     if (!match) {
         return {};
@@ -36,12 +42,6 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
     }
 }
 
-const defChangeEvent = 'popstate';
-
-function defGetCurrentPath() {
-    return window.location.pathname;
-}
-
 export interface RouterProps extends React.PropsWithChildren {
     onUpdated?: () => void;
     navigate?: (path: string, data?: any, replace?: boolean) => void;
@@ -58,25 +58,23 @@ export default function Router(props: RouterProps) {
             n(path, data, replace);
             setPath(window.location.pathname);
         },
-        changeEvent: c,
-        getCurrentPath: g,
     };
 
-    const [path, setPath] = React.useState(router.getCurrentPath());
+    const [path, setPath] = React.useState(g());
 
     React.useEffect(() => { onUpdated?.(); }, [path]);
 
     React.useEffect(() => {
-        function onPopState() {
-            setPath(router.getCurrentPath());
+        function onEvent() {
+            setPath(g());
         }
 
-        if (router.changeEvent && router.getCurrentPath) {
-            window.addEventListener(router.changeEvent, onPopState);
+        if (c && g) {
+            window.addEventListener(c, onEvent);
 
-            return () => window.removeEventListener(router.changeEvent, onPopState);
+            return () => window.removeEventListener(c, onEvent);
         }
-    }, [router.changeEvent, router.getCurrentPath]);
+    }, [c, g]);
 
     if (!children) {
         return null;
