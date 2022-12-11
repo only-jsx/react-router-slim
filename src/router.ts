@@ -56,7 +56,7 @@ export default function Router(props: RouterProps) {
         match: m,
         navigate(path: string, data?: any, replace?: boolean) {
             n(path, data, replace);
-            setPath(window.location.pathname);
+            setPath(g());
         },
     };
 
