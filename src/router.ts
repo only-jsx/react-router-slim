@@ -65,7 +65,7 @@ export default function Router(props: RouterProps) {
                 setPath(g());
             },
         }
-    }), [setPath, g]);
+    }), [path, setPath, g]);
 
     React.useEffect(() => onUpdated?.(), [path]);
 
