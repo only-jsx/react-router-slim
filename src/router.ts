@@ -62,7 +62,7 @@ export default function Router(props: RouterProps) {
 
     const [path, setPath] = React.useState(g());
 
-    React.useEffect(() => { onUpdated?.(); }, [path]);
+    React.useEffect(() => onUpdated?.(), [path]);
 
     React.useEffect(() => {
         function onEvent() {
