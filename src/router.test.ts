@@ -11,9 +11,6 @@ describe('Test Router component', () => {
     const useEffectSpy = jest.spyOn(React, 'useEffect');
     useEffectSpy.mockImplementation(f => { f() });
 
-    const useMemoSpy = jest.spyOn(React, 'useMemo');
-    useMemoSpy.mockImplementation(f => f());
-
     const useContextSpy = jest.spyOn(React, 'useContext');
     useContextSpy.mockImplementation(() => ({}));
 

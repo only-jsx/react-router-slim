@@ -22,9 +22,6 @@ describe('Test Route component', () => {
     const useEffectSpy = jest.spyOn(React, 'useEffect');
     useEffectSpy.mockImplementation(f => { f() });
 
-    const useMemoSpy = jest.spyOn(React, 'useMemo');
-    useMemoSpy.mockImplementation(f => f());
-
     const defMatch = Router({ children: 1 })?.props.value.match;
 
     const router: RouterContext = {};

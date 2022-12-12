@@ -50,22 +50,10 @@ export interface RouterProps extends React.PropsWithChildren {
     getCurrentPath?: () => string;
 }
 
-const baseRouteProps = { value: {} };
-
 export default function Router(props: RouterProps) {
     const { children, onUpdated, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
 
     const [path, setPath] = React.useState(g());
-
-    const routerProps = React.useMemo(() => ({
-        value: {
-            match: m,
-            navigate(p: string, data?: any, replace?: boolean) {
-                n(p, data, replace);
-                setPath(g());
-            },
-        }
-    }), [path, setPath, g]);
 
     React.useEffect(() => onUpdated?.(), [path]);
 
@@ -85,6 +73,18 @@ export default function Router(props: RouterProps) {
         return null;
     }
 
+    const routerProps = {
+        value: {
+            match: m,
+            navigate(p: string, data?: any, replace?: boolean) {
+                n(p, data, replace);
+                setPath(g());
+            },
+        }
+    };
+
+    const baseRouteProps = { value: {} };
+    
     const routeProvider = Array.isArray(children)
         ? React.createElement(RouteContext.Provider, baseRouteProps, ...children)
         : React.createElement(RouteContext.Provider, baseRouteProps, children);
