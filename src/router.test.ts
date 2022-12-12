@@ -11,6 +11,9 @@ describe('Test Router component', () => {
     const useEffectSpy = jest.spyOn(React, 'useEffect');
     useEffectSpy.mockImplementation(f => { f() });
 
+    const useMemoSpy = jest.spyOn(React, 'useMemo');
+    useMemoSpy.mockImplementation(f => f());
+
     const useContextSpy = jest.spyOn(React, 'useContext');
     useContextSpy.mockImplementation(() => ({}));
 
@@ -23,20 +26,28 @@ describe('Test Router component', () => {
         expect(r).toBeNull();
     });
 
-    test('with child', () => {
-        const r = Router({ children: 1 });
+    function providerCildren(r) {
         expect(r).toHaveProperty('props');
-        expect(r?.props.children).toStrictEqual(1);
+        expect(r?.props.children).toHaveProperty('props');
         expect(r?.props.value).toHaveProperty('match');
         expect(r?.props.value).toHaveProperty('navigate');
+
+        const rr = r?.props.children;
+        expect(rr?.props.value).toStrictEqual({});
+
+        return rr.props.children;
+    }
+
+    test('with child', () => {
+        const r = Router({ children: 1 });
+        const children = providerCildren(r);
+        expect(children).toStrictEqual(1);
     });
 
     test('with children', () => {
         const r = Router({ children: [1, 2, 3] });
-        expect(r).toHaveProperty('props');
-        expect(r?.props.children).toStrictEqual([1, 2, 3]);
-        expect(r?.props.value).toHaveProperty('match');
-        expect(r?.props.value).toHaveProperty('navigate');
+        const children = providerCildren(r);
+        expect(children).toStrictEqual([1, 2, 3]);
     });
 
     test('with match, navigate, changeEvent and getCurrentPath props', () => {
@@ -47,8 +58,8 @@ describe('Test Router component', () => {
         const onUpdated = jest.fn();
 
         const r = Router({ children: [1, 2, 3], onUpdated, match, navigate, changeEvent, getCurrentPath });
-        expect(r).toHaveProperty('props');
-        expect(r?.props.children).toStrictEqual([1, 2, 3]);
+        const children = providerCildren(r);
+        expect(children).toStrictEqual([1, 2, 3]);
         expect(r?.props.value.match).toBe(match);
         expect(onUpdated).toHaveBeenCalledTimes(1);
         const prev = getCurrentPath();
@@ -64,11 +75,8 @@ describe('Test Router component', () => {
 
     test('default match', () => {
         const r = Router({ children: 1 });
-        expect(r).toHaveProperty('props');
-        expect(r?.props.children).toBe(1);
-        expect(r?.props.value).toHaveProperty('match');
-        expect(r?.props.value).toHaveProperty('navigate');
-
+        const children = providerCildren(r);
+        expect(children).toStrictEqual(1);
         r?.props.value.navigate?.('/wrong');
         const m1 = r?.props.value.match?.('/path');
         expect(m1).toStrictEqual({});
@@ -92,10 +100,8 @@ describe('Test Router component', () => {
 
     test('default navigate', () => {
         const r = Router({ children: 1 });
-        expect(r).toHaveProperty('props');
-        expect(r?.props.children).toBe(1);
-        expect(r?.props.value).toHaveProperty('match');
-        expect(r?.props.value).toHaveProperty('navigate');
+        const children = providerCildren(r);
+        expect(children).toStrictEqual(1);
         const data1 = {};
         r?.props.value.navigate?.('/path', data1, true);
         expect(history.state).toBe(data1);
@@ -112,10 +118,8 @@ describe('Test Router component', () => {
         const onUpdated = jest.fn(() => { });
 
         const r = Router({ children: 1, onUpdated });
-        expect(r).toHaveProperty('props');
-        expect(r?.props.children).toBe(1);
-        expect(r?.props.value).toHaveProperty('match');
-        expect(r?.props.value).toHaveProperty('navigate');
+        const children = providerCildren(r);
+        expect(children).toStrictEqual(1);
         expect(onUpdated).toHaveBeenCalled();
 
         expect(setState).not.toHaveBeenCalled();
