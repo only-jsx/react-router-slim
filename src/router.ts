@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { tokensToRegexp, parse, Key } from 'path-to-regexp';
-import { RouterContext, Params, PathMatch } from './context';
+import { RouterContext, RouteContext, Params, PathMatch } from './context';
 
 const defChangeEvent = 'popstate';
 
@@ -52,17 +52,10 @@ export interface RouterProps extends React.PropsWithChildren {
 
 export default function Router(props: RouterProps) {
     const { children, onUpdated, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
-    const router: RouterContext = {
-        match: m,
-        navigate(path: string, data?: any, replace?: boolean) {
-            n(path, data, replace);
-            setPath(g());
-        },
-    };
 
     const [path, setPath] = React.useState(g());
 
-    React.useEffect(() => { onUpdated?.(); }, [path]);
+    React.useEffect(() => onUpdated?.(), [path]);
 
     React.useEffect(() => {
         function onEvent() {
@@ -80,11 +73,21 @@ export default function Router(props: RouterProps) {
         return null;
     }
 
-    const providerProps = { value: router };
+    const routerProps = {
+        value: {
+            match: m,
+            navigate(p: string, data?: any, replace?: boolean) {
+                n(p, data, replace);
+                setPath(g());
+            },
+        }
+    };
 
-    if (Array.isArray(children)) {
-        return React.createElement(RouterContext.Provider, providerProps, ...children);
-    }
+    const baseRouteProps = { value: {} };
+    
+    const routeProvider = Array.isArray(children)
+        ? React.createElement(RouteContext.Provider, baseRouteProps, ...children)
+        : React.createElement(RouteContext.Provider, baseRouteProps, children);
 
-    return React.createElement(RouterContext.Provider, providerProps, children);
+    return React.createElement(RouterContext.Provider, routerProps, routeProvider);
 }
