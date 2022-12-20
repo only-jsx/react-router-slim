@@ -1,9 +1,11 @@
 import { describe, expect, test } from '@jest/globals';
+import { RouterContext, RouteContext } from './context';
 import Router from './router';
 import * as React from 'react';
 
 describe('Test Router component', () => {
-    const setState = jest.fn(a => [a, setState]);
+
+    const setState: any = jest.fn(a => [a, setState]);
 
     const useStateSpy = jest.spyOn(React, 'useState') as unknown as jest.SpyInstance<[unknown, React.Dispatch<unknown>], [unknown]>;
     useStateSpy.mockImplementation((initialState: unknown) => [initialState, setState]);
@@ -23,13 +25,13 @@ describe('Test Router component', () => {
         expect(r).toBeNull();
     });
 
-    function providerCildren(r) {
+    function providerCildren(r: React.FunctionComponentElement<React.ProviderProps<RouterContext>> | null) {
         expect(r).toHaveProperty('props');
         expect(r?.props.children).toHaveProperty('props');
         expect(r?.props.value).toHaveProperty('match');
         expect(r?.props.value).toHaveProperty('navigate');
 
-        const rr = r?.props.children;
+        const rr = r?.props.children as React.FunctionComponentElement<React.ProviderProps<RouteContext>>;
         expect(rr?.props.value).toStrictEqual({});
 
         return rr.props.children;
