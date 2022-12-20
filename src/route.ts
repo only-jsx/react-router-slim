@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { RouteContext, RouterContext } from './context';
+import { RouteContext, RouterContext, Params } from './context';
 
 export interface RouteProps extends React.PropsWithChildren {
     path?: string;
@@ -16,8 +16,8 @@ export default function Route({ children, path, error }: RouteProps) {
 
     const route = React.useContext<RouteContext>(RouteContext);
 
-    let routeParams = {};
-    let routePath = (route.path || '') + (path || '');
+    let routeParams : Params | undefined = {};
+    let routePath : string | undefined = (route.path || '') + (path || '');
 
     if (path) {
         const { match, params, nextPath } = router.match(routePath);

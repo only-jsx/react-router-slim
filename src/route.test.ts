@@ -14,7 +14,7 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
 
 describe('Test Route component', () => {
 
-    const setState = jest.fn(a => [a, setState]);
+    const setState: (state: unknown) => void = jest.fn(a => [a, setState]);
 
     const useStateSpy = jest.spyOn(React, 'useState') as unknown as jest.SpyInstance<[unknown, React.Dispatch<unknown>], [unknown]>;
     useStateSpy.mockImplementation((initialState: unknown) => [initialState, setState]);

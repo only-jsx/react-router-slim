@@ -58,14 +58,12 @@ export default function Router(props: RouterProps) {
     React.useEffect(() => onUpdated?.(), [path]);
 
     React.useEffect(() => {
-        function onEvent() {
-            setPath(g());
-        }
+        const eventHandler = () => setPath(g());
 
-        if (c && g) {
-            window.addEventListener(c, onEvent);
+        if (c) {
+            window.addEventListener(c, eventHandler);
 
-            return () => window.removeEventListener(c, onEvent);
+            return () => window.removeEventListener(c, eventHandler);
         }
     }, [c, g]);
 
