@@ -73,7 +73,7 @@ describe('Test Router component', () => {
     });
 
     test('default match', () => {
-        const r = Router({ children: 1 });
+        const r = Router({ children: 1, changeEvent: '' });
         const children = providerCildren(r);
         expect(children).toStrictEqual(1);
         r?.props.value.navigate?.('/wrong');

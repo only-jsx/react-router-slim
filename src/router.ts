@@ -58,14 +58,16 @@ export default function Router(props: RouterProps) {
     React.useEffect(() => onUpdated?.(), [path]);
 
     React.useEffect(() => {
+        if (!c) {
+            return;
+        }
+
         const eventHandler = () => setPath(g());
 
-        if (c) {
-            window.addEventListener(c, eventHandler);
+        window.addEventListener(c, eventHandler);
 
-            return () => window.removeEventListener(c, eventHandler);
-        }
-    }, [c, g]);
+        return () => window.removeEventListener(c, eventHandler);
+    }, [c, g, setPath]);
 
     if (!children) {
         return null;
@@ -82,7 +84,7 @@ export default function Router(props: RouterProps) {
     };
 
     const baseRouteProps = { value: {} };
-    
+
     const routeProvider = Array.isArray(children)
         ? React.createElement(RouteContext.Provider, baseRouteProps, ...children)
         : React.createElement(RouteContext.Provider, baseRouteProps, children);
