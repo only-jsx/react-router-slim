@@ -43,7 +43,6 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
 }
 
 export interface RouterProps extends React.PropsWithChildren {
-    onUpdated?: () => void;
     navigate?: (path: string, data?: any, replace?: boolean) => void;
     match?: (path: string) => PathMatch;
     changeEvent?: string;
@@ -51,11 +50,9 @@ export interface RouterProps extends React.PropsWithChildren {
 }
 
 export default function Router(props: RouterProps) {
-    const { children, onUpdated, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
+    const { children, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
 
-    const [path, setPath] = React.useState(g());
-
-    React.useEffect(() => onUpdated?.(), [path, onUpdated]);
+    const [, setPath] = React.useState(g());
 
     React.useEffect(() => {
         if (!c) {
