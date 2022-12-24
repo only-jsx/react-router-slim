@@ -77,6 +77,7 @@ export default function Router(props: RouterProps) {
                 n(p, data, replace);
                 setPath(g());
             },
+            getCurrentPath: g,
         }
     };
 
