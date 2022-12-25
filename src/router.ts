@@ -43,7 +43,6 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
 }
 
 export interface RouterProps extends React.PropsWithChildren {
-    onUpdated?: () => void;
     navigate?: (path: string, data?: any, replace?: boolean) => void;
     match?: (path: string) => PathMatch;
     changeEvent?: string;
@@ -51,21 +50,21 @@ export interface RouterProps extends React.PropsWithChildren {
 }
 
 export default function Router(props: RouterProps) {
-    const { children, onUpdated, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
+    const { children, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
 
-    const [path, setPath] = React.useState(g());
-
-    React.useEffect(() => onUpdated?.(), [path]);
+    const [ path, setPath] = React.useState(g());
 
     React.useEffect(() => {
+        if (!c) {
+            return;
+        }
+
         const eventHandler = () => setPath(g());
 
-        if (c) {
-            window.addEventListener(c, eventHandler);
+        window.addEventListener(c, eventHandler);
 
-            return () => window.removeEventListener(c, eventHandler);
-        }
-    }, [c, g]);
+        return () => window.removeEventListener(c, eventHandler);
+    }, [c, g, setPath]);
 
     if (!children) {
         return null;
@@ -78,11 +77,12 @@ export default function Router(props: RouterProps) {
                 n(p, data, replace);
                 setPath(g());
             },
+            getCurrentPath: g,
         }
     };
 
     const baseRouteProps = { value: {} };
-    
+
     const routeProvider = Array.isArray(children)
         ? React.createElement(RouteContext.Provider, baseRouteProps, ...children)
         : React.createElement(RouteContext.Provider, baseRouteProps, children);

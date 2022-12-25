@@ -54,13 +54,11 @@ describe('Test Router component', () => {
         const navigate = jest.fn((p) => { window.location.hash = p });
         const changeEvent = 'hashchange';
         const getCurrentPath = () => window.location.hash;
-        const onUpdated = jest.fn();
 
-        const r = Router({ children: [1, 2, 3], onUpdated, match, navigate, changeEvent, getCurrentPath });
+        const r = Router({ children: [1, 2, 3], match, navigate, changeEvent, getCurrentPath });
         const children = providerCildren(r);
         expect(children).toStrictEqual([1, 2, 3]);
         expect(r?.props.value.match).toBe(match);
-        expect(onUpdated).toHaveBeenCalledTimes(1);
         const prev = getCurrentPath();
         expect(prev).not.toBe('/path');
         r?.props.value.navigate?.('/path');
@@ -73,7 +71,7 @@ describe('Test Router component', () => {
     });
 
     test('default match', () => {
-        const r = Router({ children: 1 });
+        const r = Router({ children: 1, changeEvent: '' });
         const children = providerCildren(r);
         expect(children).toStrictEqual(1);
         r?.props.value.navigate?.('/wrong');
@@ -113,13 +111,10 @@ describe('Test Router component', () => {
         expect(window.location.pathname).toBe('/path');
     });
 
-    test('with onUpdated prop', () => {
-        const onUpdated = jest.fn(() => { });
-
-        const r = Router({ children: 1, onUpdated });
+    test('popstate event', () => {
+        const r = Router({ children: 1 });
         const children = providerCildren(r);
         expect(children).toStrictEqual(1);
-        expect(onUpdated).toHaveBeenCalled();
 
         expect(setState).not.toHaveBeenCalled();
 
