@@ -41,7 +41,7 @@ The default browser history routing strategy can be replaced with custom routing
 
 **It does not provide server side routing.** You can use the routing provided by your back-end API for this.
 
-## examples
+## Examples
 Our examples also demonstrate how to implement URL hash routing.
 
 ### Simple
