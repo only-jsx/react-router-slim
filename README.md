@@ -12,7 +12,7 @@ Routing rules are declared using Router and Route components.
 - changeEvent - name of an event that may change the current path. Router listens for this event and updates content when the event is fired;
 - getCurrentPath - method for retrieving the current path;
     
-Default implementation relies on the Browser History API for the frontend routing, so 
+Default implementation relies on the browser History API for the frontend routing, so 
 default implementation of *navigate* is *window.history.pushState* or *window.history.replaceState*,
 *changeEvent* is  *popstate*, and *getCurrentPath* returns *window.location.pathname*.
 
@@ -22,14 +22,14 @@ Default implementation of the *match* function uses the *pathToRegexp* function 
 *RouterContext* contains only two functions: *match* and *navigate* from the *Router* component. *Match* is usually used by child *Route* components. *Navigate* is used by children to trigger transitions between routes.
 
 ### Route
-**Route** is a child component of the Router that controls rendering of its children depending on the current router path.
+**Route** is a child component of the *Router* that controls rendering of its children depending on the current router path.
 
 *Route* props:
 - path - path which Route renders children for;
 - error - component that is rendered in case of any errors in route children;
 
 *Route* provides the *RouteContext* to children.
-RouteContext properties are:
+*RouteContext* properties are:
 - path - current router path;
 - params - template parameters of a route;
 - matches - all path matches (may contains more than one in case of overlapped routes);
@@ -37,7 +37,7 @@ RouteContext properties are:
 
 If Route's paths are overlapped then both are rendered.
 
-The default browser history routing strategy can be replaced with custom routing strategy (hash, memory, etc.) via Router component props: *match*, *navigate*, *changeEvent*, *getCurrentPath*.
+The default browser history routing strategy can be replaced with custom routing strategy (hash, memory, etc.) via *Router* component props: *match*, *navigate*, *changeEvent*, *getCurrentPath*.
 
 **It does not provide server side routing.** You can use the routing provided by your back-end API for this.
 
@@ -49,10 +49,13 @@ Our examples also demonstrate how to implement URL hash routing.
 const App = () => <Router>
     <Route path="/(.*)">
         <Route path="path1">{child1}</Route>
-        {/* "path2/:param" and "path2/(.*)" are overlapped, both are rendered, this component has params.param === ...rest of path... */}
+        {/* "path2/:param" and "path2/(.*)" are overlapped, both are rendered */}
+        {/* this component has params.param === ...rest of path... */}
         <Route path="path2/:param">{child21}</Route>
-        <Route path="path2/(.*)">{child22}</Route> {/* but this component has params[0] === ...rest of path... */}
+        {/* this component has params[0] === ...rest of path... */}
+        <Route path="path2/(.*)">{child22}</Route>
         <Route path="path3/(.*)">{child3}</Route>
+        {/* this is a fallback route */}
         <Route>{fallback}</Route>
     </Route>
 </Router>;
@@ -113,7 +116,7 @@ const App = () => <Router>
         {/* so this actually matches to /router/home */}
         <Route path="home">
             <RoutedSpan>RoutedSpan</RoutedSpan>
-            <LinkButton>RoutedButton</LinkButton>
+            <LinkButton>LinkButton</LinkButton>
             <Link to="/hello/world">Link</Link>
         </Route>
         <Route path="await"><AwaitPage/></Route>
