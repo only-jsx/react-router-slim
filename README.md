@@ -49,13 +49,13 @@ Our examples also demonstrate how to implement URL hash routing.
 const App = () => <Router>
     <Route path="/(.*)">
         <Route path="path1">{child1}</Route>
-        /* "path2/:param" and "path3/(.*)" are overlapped, both are rendered, this component has params.param === ...rest of path... */
-        <Route path="path2/:param">{child21}</Route> 
-        <Route path="path2/(.*)">{child22}</Route> /* but this component has params[0] === ...rest of path... */
+        {/* "path2/:param" and "path2/(.*)" are overlapped, both are rendered, this component has params.param === ...rest of path... */}
+        <Route path="path2/:param">{child21}</Route>
+        <Route path="path2/(.*)">{child22}</Route> {/* but this component has params[0] === ...rest of path... */}
         <Route path="path3/(.*)">{child3}</Route>
         <Route>{fallback}</Route>
     </Route>
-</Router>
+</Router>;
 ```
 ### More complicated
 The source codes are in the repository https://github.com/only-jsx/react-router-slim-examples
@@ -105,12 +105,12 @@ const LinkButton = ({ children }) => {
 }
 
 const App = () => <Router>
-    {/*Regular expressions in path*/}
+    {/* Regular expressions in path */}
     <Route path="/router/(.*)">
         <Layout />
-        {/*Part of a parent route path before any named parameter or regexp*/}
-        {/*becames a prefix for a child route*/}
-        {/*so this actually matches to /router/home*/}
+        {/* Part of a parent route path before any named parameter or regexp */}
+        {/* becames a prefix for a child route */}
+        {/* so this actually matches to /router/home */}
         <Route path="home">
             <RoutedSpan>RoutedSpan</RoutedSpan>
             <LinkButton>RoutedButton</LinkButton>
@@ -123,14 +123,12 @@ const App = () => <Router>
         </Route>
         <Route path="todos/(.*)" error={ErrorBoundary}>
             <h5>Todo</h5>
-            {/*Named parameters*/}
+            {/* Named parameters */}
             <Route path=":id"><Todo/></Route>
         </Route>
         <Route path="error" error={ErrorBoundary}><ErrorComponent/></Route>
-        {/*Route without a path is a fallback route*/}
+        {/* Route without a path is a fallback route */}
         <Route><Fallback /></Route>
     </Route>
 </Router>;
-
-export default App;
 ```
