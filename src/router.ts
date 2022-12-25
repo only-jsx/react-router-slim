@@ -52,7 +52,7 @@ export interface RouterProps extends React.PropsWithChildren {
 export default function Router(props: RouterProps) {
     const { children, navigate: n = defNavigate, match: m = defMatch, changeEvent: c = defChangeEvent, getCurrentPath: g = defGetCurrentPath } = props;
 
-    const [, setPath] = React.useState(g());
+    const [ path, setPath] = React.useState(g());
 
     React.useEffect(() => {
         if (!c) {
