@@ -1,6 +1,6 @@
 {
     "name": "react-router-slim",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Declarative browser routing for React Web applications",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -34,7 +34,9 @@
     },
     "files": [
         "dist.es2015/",
-        "dist/"
+        "dist/",
+        "README.md",
+        "LICENSE"
     ],
     "keywords": [
         "react",

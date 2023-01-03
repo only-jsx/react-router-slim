@@ -73,13 +73,12 @@ interface LinkProps extends React.PropsWithChildren {
 }
 
 //Router Link component implementation
-const Link = ({ children, to }: LinkProps) => {
+const Link = ({ children, to, replace }: LinkProps) => {
     const router = React.useContext(RouterContext);
-    const navigate = router.navigate;
-    const onClick = React.useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
-        navigate?.(to);
-    }, [to, navigate]);
+        router.navigate?.(to, undefined, replace);
+    };
 
     return <a href={to} onClick={onClick}>{children}</a>
 }
@@ -89,7 +88,7 @@ const RoutedSpan = ({ children }) => {
     const route = React.useContext(RouteContext);
 
     if (!route) {
-        return 'Routes are not allowed outside the Router component';
+        throw new Error('RoutedSpan is not allowed outside the Router component');
     }
 
     const { params } = route;
@@ -101,7 +100,7 @@ const LinkButton = ({ children }) => {
     const router = React.useContext(RouterContext);
 
     if (!router.navigate) {
-        return 'Routes navigate is not defined';
+        throw new Error('Router navigate is not defined');
     }
 
     return <button onClick={(e) => router.navigate('/hello/world', {state: 0}, true)}>{children}</button>;
