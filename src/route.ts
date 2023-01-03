@@ -9,15 +9,14 @@ export interface RouteProps extends React.PropsWithChildren {
 
 export default function Route({ children, path, error }: RouteProps) {
     const router = React.useContext<RouterContext>(RouterContext);
+    const route = React.useContext<RouteContext>(RouteContext);
 
     if (!router.match) {
         throw new Error('Route requires a match function in the Router context');
     }
 
-    const route = React.useContext<RouteContext>(RouteContext);
-
-    let routeParams : Params | undefined = {};
-    let routePath : string | undefined = (route.path || '') + (path || '');
+    let routeParams: Params | undefined = {};
+    let routePath: string | undefined = (route.path || '') + (path || '');
 
     if (path) {
         const { match, params, nextPath } = router.match(routePath);

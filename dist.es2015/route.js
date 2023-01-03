@@ -25,10 +25,10 @@ export default function Route(_a) {
     var _b;
     var children = _a.children, path = _a.path, error = _a.error;
     var router = React.useContext(RouterContext);
+    var route = React.useContext(RouteContext);
     if (!router.match) {
         throw new Error('Route requires a match function in the Router context');
     }
-    var route = React.useContext(RouteContext);
     var routeParams = {};
     var routePath = (route.path || '') + (path || '');
     if (path) {
