@@ -34,9 +34,7 @@
     },
     "files": [
         "dist.es2015/",
-        "dist/",
-        "README.md",
-        "LICENSE"
+        "dist/"
     ],
     "keywords": [
         "react",
