@@ -3,6 +3,7 @@ import Route from './route';
 import Router from './router';
 import { RouterContext, RouteContext, Params } from './context';
 import * as React from 'react';
+import { ErrorBoundaryPropsWithComponent } from 'react-error-boundary';
 
 function defNavigate(path: string, data?: any, replace?: boolean) {
     if (replace) {
@@ -12,11 +13,18 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
     }
 }
 
-describe('Test Route component', () => {
+jest.mock('react', () => ({
+    ...jest.requireActual('react'),
+    useState: jest.fn(),
+    useEffect: jest.fn(),
+    useContext: jest.fn(),
+}));
 
+describe('Test Route component', () => {
     const setState: (state: unknown) => void = jest.fn(a => [a, setState]);
 
     const useStateSpy = jest.spyOn(React, 'useState') as unknown as jest.SpyInstance<[unknown, React.Dispatch<unknown>], [unknown]>;
+
     useStateSpy.mockImplementation((initialState: unknown) => [initialState, setState]);
 
     const useEffectSpy = jest.spyOn(React, 'useEffect');
@@ -49,13 +57,13 @@ describe('Test Route component', () => {
 
     test('without Router', () => {
         delete router.match;
-        expect(() => Route({})).toThrowError('Route requires a match function in the Router context');
+        expect(() => Route({})).toThrow('Route requires a match function in the Router context');
     });
 
     test('without children', () => {
         const r = Route({});
         expect(r).toHaveProperty('props');
-        expect(r?.props.children).toBe(undefined);
+        expect((r?.props as React.PropsWithChildren).children).toBe(undefined);
         const context = r?.props as React.ProviderProps<RouteContext>;
         expect(context.value).toHaveProperty('matches');
         expect(context.value).toHaveProperty('params');
@@ -65,7 +73,7 @@ describe('Test Route component', () => {
     test('empty', () => {
         const r = Route({ children: [1, 2, 3] });
         expect(r).toHaveProperty('props');
-        expect(r?.props.children).toStrictEqual([1, 2, 3]);
+        expect((r?.props as React.PropsWithChildren).children).toStrictEqual([1, 2, 3]);
         const context = r?.props as React.ProviderProps<RouteContext>;
         expect(context.value).toHaveProperty('matches');
         expect(context.value).toHaveProperty('params');
@@ -89,7 +97,7 @@ describe('Test Route component', () => {
             route.params = params;
             const r = Route({ children: '1' });
             expect(r).toHaveProperty('props');
-            expect(r?.props.children).toBe('1');
+            expect((r?.props as React.PropsWithChildren).children).toBe('1');
             const context = r?.props as React.ProviderProps<RouteContext>;
             expect(context.value).toHaveProperty('matches');
             expect(context.value).toHaveProperty('params');
@@ -106,7 +114,7 @@ describe('Test Route component', () => {
         route.path = '/parent';
         const r = Route({ children: '1', path: '/child' });
         expect(r).toHaveProperty('props');
-        expect(r?.props.children).toBe('1');
+        expect((r?.props as React.PropsWithChildren).children).toBe('1');
     });
 
     test('wrong parent path', () => {
@@ -135,7 +143,7 @@ describe('Test Route component', () => {
             });
             const r = Route({ children, path: '/child', error });
             expect(r).toHaveProperty('props');
-            expect((r?.props.children as React.ReactElement).props.FallbackComponent).toBe(error);
+            expect((((r?.props as React.PropsWithChildren).children as React.ReactElement).props as ErrorBoundaryPropsWithComponent).FallbackComponent).toBe(error);
         });
 
     testError('with error boundary', '1');
@@ -160,8 +168,8 @@ describe('Test Route component', () => {
         const r = Route({ children, path: '/child', error });
 
         expect(r).toHaveProperty('props');
-        expect((r?.props.children as React.ReactElement).props.FallbackComponent).toBe(error);
-        expect((r?.props.children as React.ReactElement).props.children.type).toBe(children.type);
+        expect((((r?.props as React.PropsWithChildren).children as React.ReactElement).props as ErrorBoundaryPropsWithComponent).FallbackComponent).toBe(error);
+        expect(((((r?.props as React.PropsWithChildren).children as React.ReactElement).props as React.PropsWithChildren).children as React.ReactElement).type).toBe(children.type);
     });
 
     test('path', () => {
@@ -177,9 +185,10 @@ describe('Test Route component', () => {
         };
 
         testPathHandle('/parent1/parent2/child/', '/par\\ent1/parent2/', ':child/', '/parent1/parent2/', { child: 'child' });
-        testPathHandle('/child1/child2/index.html', '/child1/', 'child2/(in)(.*).html', '/child1/child2/', { 0: 'in', 1: 'dex' });
-        testPathHandle('/child1/child2/index.html', '', '/child1/:c1/(inde)(.*).html', '/child1/', { c1: 'child2', '0': 'inde', '1': 'x' });
-        testPathHandle('/child1/child2', '/child1/', '(child2)', '/child1/', { 0: 'child2' });
+        testPathHandle('/child1/child2/index.html', '/child1/', 'child2/*html', '/child1/child2/', {});
+        testPathHandle('/child1/index.html', '/child1/', '{child2/}:html', '/child1/', { html: 'index.html' });
+        testPathHandle('/child1/child2/index.html', '', '/child1/:c1/:index', '/child1/', { c1: 'child2', index: 'index.html' });
+        testPathHandle('/child1/child2', '/child1/', '*child2', '/child1/', {});
         testPathHandle('/child1/child2/', '/child1/', 'child2/', '/child1/child2/', {});
         testPathHandle('/child1/', '', '/:child1', '/', { child1: 'child1' });
     });

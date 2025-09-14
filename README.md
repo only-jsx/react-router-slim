@@ -107,10 +107,10 @@ const LinkButton = ({ children }) => {
 }
 
 const App = () => <Router>
-    {/* Regular expressions in path */}
-    <Route path="/router/(.*)">
+    {/* Regular expressions in path with wildcard */}
+    <Route path="/router/*wildcard">
         <Layout />
-        {/* Part of a parent route path before any named parameter or regexp */}
+        {/* Part of a parent route path before any named parameter or wildcard */}
         {/* becames a prefix for a child route */}
         {/* so this actually matches to /router/home */}
         <Route path="home">
@@ -118,12 +118,12 @@ const App = () => <Router>
             <LinkButton>LinkButton</LinkButton>
             <Link to="/hello/world">Link</Link>
         </Route>
-        <Route path="await"><AwaitPage/></Route>
+        <Route path="await{/:optional}/status"><AwaitPage/></Route>
         <Route path="long-load"><LongLoad/></Route>
         <Route path="todos" error={ErrorBoundary}>
             <TodosList/>
         </Route>
-        <Route path="todos/(.*)" error={ErrorBoundary}>
+        <Route path="todos/*todo" error={ErrorBoundary}>
             <h5>Todo</h5>
             {/* Named parameters */}
             <Route path=":id"><Todo/></Route>

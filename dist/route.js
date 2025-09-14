@@ -20,6 +20,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = Route;
 var React = require("react");
 var react_error_boundary_1 = require("react-error-boundary");
 var context_1 = require("./context");
@@ -63,4 +64,3 @@ function Route(_a) {
     }
     return React.createElement(context_1.RouteContext.Provider, props, children);
 }
-exports.default = Route;

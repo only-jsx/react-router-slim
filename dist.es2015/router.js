@@ -8,33 +8,27 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 import * as React from 'react';
-import { tokensToRegexp, parse } from 'path-to-regexp';
+import { pathToRegexp, parse } from 'path-to-regexp';
 import { RouterContext, RouteContext } from './context';
 var defChangeEvent = 'popstate';
 function defGetCurrentPath() {
     return window.location.pathname;
 }
 function defMatch(path) {
-    var _a;
-    var keys = [];
-    var tokens = parse(path);
-    var pattern = tokensToRegexp(tokens, keys);
+    var tokens = parse(path).tokens;
+    var _a = pathToRegexp(path), regexp = _a.regexp, keys = _a.keys;
     var pathname = defGetCurrentPath();
-    var match = pattern.exec(pathname);
+    var match = regexp.exec(pathname);
     if (!match) {
         return {};
     }
     var params = {};
-    for (var i = 1; i < match.length; i++) {
-        params[keys[i - 1]['name']] = match[i];
+    for (var i = 0; i < keys.length; i++) {
+        if (keys[i].type === 'param' && match[i + 1]) {
+            params[keys[i].name] = match[i + 1];
+        }
     }
-    var nextPath = '';
-    if (typeof tokens[0] === 'string') {
-        nextPath = ((_a = tokens[1]) === null || _a === void 0 ? void 0 : _a.prefix) ? tokens[0] + tokens[1].prefix : tokens[0];
-    }
-    else {
-        nextPath = tokens[0].prefix || '';
-    }
+    var nextPath = tokens[0].type === 'text' ? tokens[0].value : '';
     return { match: match, params: params, nextPath: nextPath };
 }
 function defNavigate(path, data, replace) {

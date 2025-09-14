@@ -6,4 +6,4 @@ export interface RouterProps extends React.PropsWithChildren {
     changeEvent?: string;
     getCurrentPath?: () => string;
 }
-export default function Router(props: RouterProps): React.FunctionComponentElement<React.ProviderProps<RouterContext>> | null;
+export default function Router(props: RouterProps): React.ReactElement<React.ProviderProps<RouterContext>, string | React.JSXElementConstructor<any>> | null;

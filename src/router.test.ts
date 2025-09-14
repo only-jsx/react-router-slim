@@ -3,8 +3,14 @@ import { RouterContext, RouteContext } from './context';
 import Router from './router';
 import * as React from 'react';
 
-describe('Test Router component', () => {
+jest.mock('react', () => ({
+    ...jest.requireActual('react'),
+    useState: jest.fn(),
+    useEffect: jest.fn(),
+    useContext: jest.fn(),
+}));
 
+describe('Test Router component', () => {
     const setState: any = jest.fn(a => [a, setState]);
 
     const useStateSpy = jest.spyOn(React, 'useState') as unknown as jest.SpyInstance<[unknown, React.Dispatch<unknown>], [unknown]>;
@@ -25,16 +31,16 @@ describe('Test Router component', () => {
         expect(r).toBeNull();
     });
 
-    function providerCildren(r: React.FunctionComponentElement<React.ProviderProps<RouterContext>> | null) {
+    function providerCildren(r: React.ReactElement<React.ProviderProps<RouterContext>> | null) {
         expect(r).toHaveProperty('props');
         expect(r?.props.children).toHaveProperty('props');
         expect(r?.props.value).toHaveProperty('match');
         expect(r?.props.value).toHaveProperty('navigate');
 
-        const rr = r?.props.children as React.FunctionComponentElement<React.ProviderProps<RouteContext>>;
+        const rr = r?.props.children as React.ReactElement<React.ProviderProps<RouterContext>> | null;
         expect(rr?.props.value).toStrictEqual({});
 
-        return rr.props.children;
+        return rr?.props.children;
     }
 
     test('with child', () => {
@@ -78,7 +84,7 @@ describe('Test Router component', () => {
         const m1 = r?.props.value.match?.('/path');
         expect(m1).toStrictEqual({});
 
-        const testMatch = (navigated: string, path: string, mr: string[], params: object, nextPath: string) => {
+        const testMatch = (navigated: string, path: string, mr: (string | undefined)[], params: object, nextPath: string) => {
             r?.props.value.navigate?.(navigated);
             const m = r?.props.value.match?.(path);
             const match = [...mr] as any;
@@ -90,9 +96,12 @@ describe('Test Router component', () => {
 
         testMatch('/path/1', '/path/:id', ['/path/1', '1'], { id: '1' }, '/path/');
         testMatch('/path/1/2', '/path/1/:id', ['/path/1/2', '2'], { id: '2' }, '/path/1/');
+        testMatch('/path/1/2', '/path{/1}/:id', ['/path/1/2', '2'], { id: '2' }, '/path');
+        testMatch('/path/1/2/3/4', '/path/*wildcard/4', ['/path/1/2/3/4', '1/2/3'], {}, '/path/');
+        testMatch('/path/2', '/path/{optional/}:id', ['/path/2', , '2'], { id: '2' }, '/path/');
         testMatch('/child/', '/:child', ['/child/', 'child'], { child: 'child' }, '/');
         testMatch('/child', '/:child', ['/child', 'child'], { child: 'child' }, '/');
-        testMatch('/child', '(/child)', ['/child', '/child'], { 0: '/child' }, '');
+        testMatch('/child', '*child', ['/child', '/child'], {}, '');
     });
 
     test('default navigate', () => {
