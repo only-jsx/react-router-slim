@@ -1,7 +1,7 @@
-import { describe, expect, test } from '@jest/globals';
-import { RouterContext, RouteContext } from './context';
-import Router from './router';
 import * as React from 'react';
+import { describe, expect, test } from '@jest/globals';
+import Router from './router';
+import { RouterContext } from './context';
 
 jest.mock('react', () => ({
     ...jest.requireActual('react'),

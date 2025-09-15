@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { pathToRegexp, parse } from 'path-to-regexp';
-import { RouterContext, RouteContext, Params, PathMatch } from './context';
+import { RouterContext, RouteContext } from './context';
+import type { Params, PathMatch } from './context';
 
 const defChangeEvent = 'popstate';
 

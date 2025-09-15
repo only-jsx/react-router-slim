@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { RouteContext, RouterContext, Params } from './context';
+import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
+import { RouteContext, RouterContext, type Params } from './context';
 
 export interface RouteProps extends React.PropsWithChildren {
     path?: string;

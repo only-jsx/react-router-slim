@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { RouterContext, PathMatch } from './context';
+import { RouterContext } from './context';
+import type { PathMatch } from './context';
 export interface RouterProps extends React.PropsWithChildren {
     navigate?: (path: string, data?: any, replace?: boolean) => void;
     match?: (path: string) => PathMatch;

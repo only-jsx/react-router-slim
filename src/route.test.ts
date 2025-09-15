@@ -1,9 +1,9 @@
+import * as React from 'react';
 import { describe, expect, test } from '@jest/globals';
+import type { ErrorBoundaryPropsWithComponent } from 'react-error-boundary';
 import Route from './route';
 import Router from './router';
-import { RouterContext, RouteContext, Params } from './context';
-import * as React from 'react';
-import { ErrorBoundaryPropsWithComponent } from 'react-error-boundary';
+import { RouterContext, RouteContext, type Params } from './context';
 
 function defNavigate(path: string, data?: any, replace?: boolean) {
     if (replace) {
