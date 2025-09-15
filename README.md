@@ -47,14 +47,14 @@ Our examples also demonstrate how to implement URL hash routing.
 ### Simple
 ```tsx
 const App = () => <Router>
-    <Route path="/(.*)">
+    <Route path="/*wildcard">
         <Route path="path1">{child1}</Route>
         {/* "path2/:param" and "path2/(.*)" are overlapped, both are rendered */}
         {/* this component has params.param === ...rest of path... */}
         <Route path="path2/:param">{child21}</Route>
         {/* this component has params[0] === ...rest of path... */}
-        <Route path="path2/(.*)">{child22}</Route>
-        <Route path="path3/(.*)">{child3}</Route>
+        <Route path="path2/*child">{child22}</Route>
+        <Route path="path3/*child">{child3}</Route>
         {/* this is a fallback route */}
         <Route>{fallback}</Route>
     </Route>
