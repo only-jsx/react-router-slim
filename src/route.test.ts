@@ -16,7 +16,8 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
 jest.mock('react', () => ({
     ...jest.requireActual('react'),
     useState: jest.fn(),
-    useEffect: jest.fn(),
+    useSyncExternalStore: jest.fn(),
+    useCallback: jest.fn(),
     useContext: jest.fn(),
 }));
 
@@ -27,8 +28,20 @@ describe('Test Route component', () => {
 
     useStateSpy.mockImplementation((initialState: unknown) => [initialState, setState]);
 
-    const useEffectSpy = jest.spyOn(React, 'useEffect');
-    useEffectSpy.mockImplementation(f => { f() });
+    const useSyncExternalStoreSpy = jest.spyOn(React, 'useSyncExternalStore');
+
+    let cleanup: (() => void) | undefined = undefined;
+
+    useSyncExternalStoreSpy.mockImplementation((f) => {
+        if (cleanup) {
+            cleanup();
+        }
+        cleanup = f(() => { });
+        return cleanup;
+    });
+
+    const useCallbackSpy = jest.spyOn(React, 'useCallback');
+    useCallbackSpy.mockImplementation((f) => f);
 
     const defMatch = Router({ children: 1 })?.props.value.match;
 

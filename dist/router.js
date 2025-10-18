@@ -42,17 +42,20 @@ function defNavigate(path, data, replace) {
         window.history.pushState(data, '', path);
     }
 }
+function getUndefinedSnapshot() {
+}
 function Router(props) {
     var children = props.children, _a = props.navigate, n = _a === void 0 ? defNavigate : _a, _b = props.match, m = _b === void 0 ? defMatch : _b, _c = props.changeEvent, c = _c === void 0 ? defChangeEvent : _c, _d = props.getCurrentPath, g = _d === void 0 ? defGetCurrentPath : _d;
     var _e = React.useState(g()), path = _e[0], setPath = _e[1];
-    React.useEffect(function () {
+    var subscribeEvent = React.useCallback(function () {
         if (!c) {
-            return;
+            return getUndefinedSnapshot;
         }
         var eventHandler = function () { return setPath(g()); };
         window.addEventListener(c, eventHandler);
         return function () { return window.removeEventListener(c, eventHandler); };
-    }, [c, g, setPath]);
+    }, [c, g]);
+    React.useSyncExternalStore(subscribeEvent, getUndefinedSnapshot);
     if (!children) {
         return null;
     }

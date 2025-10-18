@@ -6,7 +6,8 @@ import { RouterContext } from './context';
 jest.mock('react', () => ({
     ...jest.requireActual('react'),
     useState: jest.fn(),
-    useEffect: jest.fn(),
+    useSyncExternalStore: jest.fn(),
+    useCallback: jest.fn(),
     useContext: jest.fn(),
 }));
 
@@ -16,8 +17,20 @@ describe('Test Router component', () => {
     const useStateSpy = jest.spyOn(React, 'useState') as unknown as jest.SpyInstance<[unknown, React.Dispatch<unknown>], [unknown]>;
     useStateSpy.mockImplementation((initialState: unknown) => [initialState, setState]);
 
-    const useEffectSpy = jest.spyOn(React, 'useEffect');
-    useEffectSpy.mockImplementation(f => { f() });
+    const useSyncExternalStoreSpy = jest.spyOn(React, 'useSyncExternalStore');
+
+    let cleanup: (() => void) | undefined = undefined;
+
+    useSyncExternalStoreSpy.mockImplementation((f) => {
+        if (cleanup) {
+            cleanup();
+        }
+        cleanup = f(() => { });
+        return cleanup;
+    });
+
+    const useCallbackSpy = jest.spyOn(React, 'useCallback');
+    useCallbackSpy.mockImplementation((f) => f);
 
     const useContextSpy = jest.spyOn(React, 'useContext');
     useContextSpy.mockImplementation(() => ({}));
@@ -74,6 +87,27 @@ describe('Test Router component', () => {
 
         window.dispatchEvent(new Event(changeEvent));
         expect(setState).toHaveBeenCalledTimes(2);
+    });
+
+    test('without changeEvent', () => {
+        const match = (path: string) => ({});
+        const navigate = jest.fn((p) => { window.location.hash = p });
+        const changeEvent = null;
+        const getCurrentPath = () => window.location.hash;
+
+        const r = Router({ children: [1, 2, 3], match, navigate, changeEvent, getCurrentPath });
+        const children = providerCildren(r);
+        expect(children).toStrictEqual([1, 2, 3]);
+        expect(r?.props.value.match).toBe(match);
+        const prev = getCurrentPath();
+        expect(prev).not.toBe('/path');
+        r?.props.value.navigate?.('/path');
+        expect(navigate).toHaveBeenCalled();
+        expect(setState).toHaveBeenCalledTimes(1);
+        expect(getCurrentPath()).toBe('#/path');
+
+        window.dispatchEvent(new Event('popstate'));
+        expect(setState).toHaveBeenCalledTimes(1);
     });
 
     test('default match', () => {

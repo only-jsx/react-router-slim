@@ -42,10 +42,13 @@ function defNavigate(path: string, data?: any, replace?: boolean) {
     }
 }
 
+function getUndefinedSnapshot() {
+}
+
 export interface RouterProps extends React.PropsWithChildren {
     navigate?: (path: string, data?: any, replace?: boolean) => void;
     match?: (path: string) => PathMatch;
-    changeEvent?: string;
+    changeEvent?: string | null;
     getCurrentPath?: () => string;
 }
 
@@ -54,9 +57,9 @@ export default function Router(props: RouterProps) {
 
     const [path, setPath] = React.useState(g());
 
-    React.useEffect(() => {
+    const subscribeEvent = React.useCallback(() => {
         if (!c) {
-            return;
+            return getUndefinedSnapshot;
         }
 
         const eventHandler = () => setPath(g());
@@ -64,7 +67,10 @@ export default function Router(props: RouterProps) {
         window.addEventListener(c, eventHandler);
 
         return () => window.removeEventListener(c, eventHandler);
-    }, [c, g, setPath]);
+
+    }, [c, g])
+
+    React.useSyncExternalStore(subscribeEvent, getUndefinedSnapshot);
 
     if (!children) {
         return null;
